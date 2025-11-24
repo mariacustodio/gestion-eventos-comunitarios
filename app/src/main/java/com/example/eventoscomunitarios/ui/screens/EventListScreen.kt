@@ -13,35 +13,21 @@ import com.example.eventoscomunitarios.viewmodel.EventViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventListScreen(
-    onEventClick: (String) -> Unit,
-    viewModel: EventViewModel = viewModel()
-) {
-    LaunchedEffect(Unit) {
-        viewModel.loadEvents()
-    }
-
+fun EventListScreen(onEventClick: (String) -> Unit, viewModel: EventViewModel = viewModel()) {
+    LaunchedEffect(Unit) { viewModel.loadEvents() }
     val events by viewModel.events.collectAsState()
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Eventos") }) }
-    ) {
+    Scaffold(topBar = { TopAppBar(title = { Text("Eventos") }) }) {
         LazyColumn(modifier = Modifier.padding(it)) {
             items(events) { event ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onEventClick(event.id) }
-                        .padding(16.dp)
-                ) {
-                    Text(text = event.title, style = MaterialTheme.typography.titleMedium)
+                Column(modifier = Modifier.fillMaxWidth().clickable { onEventClick(event.id) }.padding(16.dp)) {
+                    Text(event.title, style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = event.date + " " + event.time)
-                    Text(text = event.location)
+                    Text("${event.date} ${event.time}")
+                    Text(event.location)
                 }
                 Divider()
             }
         }
     }
 }
-

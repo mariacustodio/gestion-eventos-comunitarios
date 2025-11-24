@@ -19,9 +19,7 @@ class EventViewModel : ViewModel() {
     val selectedEvent: StateFlow<Event?> = _selectedEvent
 
     fun loadEvents() {
-        viewModelScope.launch {
-            _events.value = repository.getAllEvents()
-        }
+        viewModelScope.launch { _events.value = repository.getAllEvents() }
     }
 
     fun addEvent(event: Event) {
@@ -32,8 +30,6 @@ class EventViewModel : ViewModel() {
     }
 
     fun selectEvent(eventId: String) {
-        viewModelScope.launch {
-            _selectedEvent.value = repository.getEventById(eventId)
-        }
+        viewModelScope.launch { _selectedEvent.value = repository.getEventById(eventId) }
     }
 }

@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
-data class Evento(
+data class Event(
     val id: String = "",
     val nombre: String = "",
     val descripcion: String = "",

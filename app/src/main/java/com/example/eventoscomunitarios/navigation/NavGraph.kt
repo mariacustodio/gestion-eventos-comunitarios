@@ -9,52 +9,37 @@ import com.example.eventoscomunitarios.ui.screens.*
 @Composable
 fun AppNavGraph(navController: NavHostController) {
 
-    NavHost(
-        navController = navController,
-        startDestination = "login"     // 👈 Ahora inicia en Login
-    ) {
+    NavHost(navController = navController, startDestination = "login") {
 
-        // LOGIN
         composable("login") {
             LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate("event_list") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                },
-                onGoToRegister = {
-                    navController.navigate("register")
-                }
+                onLoginSuccess = { navController.navigate("event_list") { popUpTo("login") { inclusive = true } } },
+                onGoToRegister = { navController.navigate("register") }
             )
         }
 
-        // REGISTRO
         composable("register") {
             RegisterScreen(
-                onRegisterSuccess = {
-                    navController.navigate("event_list") {
-                        popUpTo("register") { inclusive = true }
-                    }
-                },
-                onGoToLogin = {
-                    navController.navigate("login")
-                }
+                onRegisterSuccess = { navController.navigate("event_list") { popUpTo("register") { inclusive = true } } },
+                onGoToLogin = { navController.navigate("login") }
             )
         }
 
-        // LISTA DE EVENTOS
         composable("event_list") {
-            EventListScreen(
-                onEventClick = { eventId ->
-                    navController.navigate("event_detail/$eventId")
-                }
-            )
+            EventListScreen(onEventClick = { eventId -> navController.navigate("event_detail/$eventId") })
         }
 
-        // DETALLE
         composable("event_detail/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
             EventDetailScreen(eventId = eventId)
+        }
+
+        composable("create_event") {
+            CreateEventScreen(navBack = { navController.popBackStack() })
+        }
+
+        composable("profile") {
+            ProfileScreen(onLogout = { navController.navigate("login") { popUpTo("event_list") { inclusive = true } } })
         }
     }
 }

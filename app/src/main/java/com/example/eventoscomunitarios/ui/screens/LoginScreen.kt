@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,6 +19,7 @@ fun LoginScreen(
     var errorMessage by remember { mutableStateOf("") }
 
     val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Iniciar Sesión") }) }
@@ -49,8 +51,21 @@ fun LoginScreen(
             Button(
                 onClick = {
                     auth.signInWithEmailAndPassword(email, password)
-                        .addOnSuccessListener { onLoginSuccess() }
-                        .addOnFailureListener { errorMessage = "Credenciales incorrectas" }
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val uid = auth.currentUser?.uid
+                                if (uid != null) {
+                                    db.collection("users").document(uid).get()
+                                        .addOnSuccessListener { doc ->
+                                            if (doc.exists()) onLoginSuccess()
+                                            else errorMessage = "Usuario no registrado"
+                                        }
+                                        .addOnFailureListener { errorMessage = it.message ?: "Error al verificar" }
+                                } else errorMessage = "UID nulo"
+                            } else {
+                                errorMessage = task.exception?.message ?: "Credenciales incorrectas"
+                            }
+                        }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -62,10 +77,8 @@ fun LoginScreen(
             }
 
             if (errorMessage.isNotEmpty()) {
-                Text(
-                    errorMessage,
-                    color = androidx.compose.ui.graphics.Color.Red
-                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(errorMessage, color = androidx.compose.ui.graphics.Color.Red)
             }
         }
     }
